@@ -1,0 +1,27 @@
+name: Release Drafter
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  update_release_draft:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d_PR#')"
+      # Drafts your next Release notes as Pull Requests are merged into "master"
+      - uses: release-drafter/release-drafter@v5
+        with:
+          # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
+          # config-name: my-config.yml
+          config-name: templates/release-drafter.yml
+          # name and tag will be updated manually if releasing on same day
+          name: ${{ steps.date.outputs.date }}${{ github.event.pull_request.number }} リリース🚀
+          # we don't use SemVer but a kind of CalVer
+          tag: ${{ steps.date.outputs.date }}${{ github.event.pull_request.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
