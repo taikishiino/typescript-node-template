@@ -1,0 +1,20 @@
+name: Release Drafter
+on:
+  push:
+    branches:
+      - main
+jobs:
+  update_release_draft:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d_PR#')"
+      - uses: release-drafter/release-drafter@v5
+        with:
+          config-name: templates/release-drafter.yml
+          name: ${{ steps.date.outputs.date }}${{ github.event.pull_request.number }} リリース🚀
+          tag: ${{ steps.date.outputs.date }}${{ github.event.pull_request.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
